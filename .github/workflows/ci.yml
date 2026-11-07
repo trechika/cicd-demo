@@ -24,3 +24,23 @@ jobs:
 
       - name: Run tests
         run: pytest -q
+
+  deploy:
+    needs: test               # only starts if the "test" job succeeded
+    if: github.ref == 'refs/heads/main'   # only deploy from main, never from a PR branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: "Package the app (simulated build artifact)"
+        run: |
+          mkdir -p dist
+          cp calc.py dist/
+          echo "built from commit ${GITHUB_SHA}" > dist/BUILD_INFO.txt
+          tar -czf app.tar.gz dist
+
+      - name: "Deploy (simulated)"
+        run: |
+          echo "Deploying app.tar.gz to production..."
+          echo "Deployed commit ${GITHUB_SHA} successfully."
